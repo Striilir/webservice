@@ -1,5 +1,5 @@
-# Webservice Auth
-Ce projet est une API d'authentification construite avec NestJS. Il fournit des fonctionnalités d'authentification telles que la connexion, l'inscription, et la gestion des sessions utilisateurs.
+# Webservice
+Ce projet est une API d'authentification et une librairie de films construite avec NestJS. Il fournit des fonctionnalités d'authentification telles que la connexion, l'inscription, et la gestion des sessions utilisateurs. Pour la partie films il fournit la creation modification suppression et recherche de films.
 ## Prérequis
 Docker
 Docker Compose
