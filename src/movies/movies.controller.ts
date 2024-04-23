@@ -2,9 +2,11 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
+  Post,
   Req,
   UnauthorizedException,
   UseInterceptors,
@@ -34,5 +36,18 @@ export class MoviesController {
       throw new UnauthorizedException();
     }
     return this.moviesService.findOne(id);
+  }
+
+  @Post('movies')
+  create(@Body() movie: any) {
+    return this.moviesService.create(movie);
+  }
+
+  @Delete('movies/:id')
+  remove(@Param('id') id: string, @Req() req: any) {
+    if (req.movie.id !== id) {
+      throw new UnauthorizedException();
+    }
+    return this.moviesService.delete(id);
   }
 }

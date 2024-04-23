@@ -14,6 +14,6 @@ export class Movie {
   @Column({ type: 'date' })
   date: Date;
 
-  @Column({ type: 'number' })
+  @Column({ type: 'int' })
   note: number;
 }

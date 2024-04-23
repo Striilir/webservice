@@ -13,6 +13,8 @@ services:
       - /var/lib/postgresql/data
     ports:
       - '5432:5432'
+    networks:
+      - movies-network
 
   api:
     build:
@@ -25,3 +27,9 @@ services:
       - db
     volumes:
       - ./src:/app/src
+    networks:
+      - movies-network
+
+networks:
+  movies-network:
+    driver: bridge
