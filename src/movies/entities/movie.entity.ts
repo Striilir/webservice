@@ -1,30 +1,33 @@
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
-  ManyToMany,
+  Entity,
   JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Category } from './category.entity';
 
 @Entity()
 export class Movie {
-  @PrimaryGeneratedColumn('increment')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'varchar', length: 128 })
-  name: string;
+  title: string;
 
   @Column({ type: 'varchar', length: 2048 })
   description: string;
 
   @Column({ type: 'date' })
-  date: Date;
+  releaseDate: Date;
 
-  @Column({ type: 'int' })
-  note: number;
+  @Column({ type: 'int', nullable: true })
+  rating?: number;
+
+  @Column({ nullable: true })
+  posterUrl?: string;
 
   @ManyToMany(() => Category)
-  @JoinTable()
+  @JoinTable({ name: 'movie_category' })
   categories: Category[];
 }

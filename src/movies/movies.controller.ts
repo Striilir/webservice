@@ -1,71 +1,53 @@
 import {
   Body,
-  ClassSerializerInterceptor,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
   Param,
-  ParseIntPipe,
-  Patch,
   Post,
-  Query,
-  Req,
-  UnauthorizedException,
+  Put,
   UseInterceptors,
 } from '@nestjs/common';
-import { UpdateMovieDto } from './dto/update-movie.dto';
-import { MoviesService } from './movies.service';
-import { Query as ExpressQuery } from 'express-serve-static-core';
-import { Pagination } from 'nestjs-typeorm-paginate';
-import { Movie } from './entities/movie.entity';
-import { HalInterceptor } from './hal.movie.interceptor';
 import { Paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
+import { CreateMovieDto, UpdateMovieDto } from './dto/movie.dto';
+import { Movie } from './entities/movie.entity';
+import { HalInterceptor } from './interceptors/hal.movie.interceptor';
+import { MovieService } from './movies.service';
 
-@Controller()
-@UseInterceptors(ClassSerializerInterceptor)
-export class MoviesController {
-  constructor(private readonly moviesService: MoviesService) {}
-  @Patch('movies/:id')
-  @UseInterceptors(HalInterceptor)
-  update(
-    @Param('id') id: string,
-    @Body() updateMovieDto: UpdateMovieDto,
-    @Req() req: any,
-  ) {
-    if (req.movie.id !== id) {
-      throw new UnauthorizedException();
-    }
-    return this.moviesService.update(id, updateMovieDto);
-  }
+@Controller('movies')
+export class MovieController {
+  constructor(private readonly movieService: MovieService) {}
 
-  @Get('movies/:id')
-  @UseInterceptors(HalInterceptor)
-  findOne(@Param('id') id: string, @Req() req: any) {
-    if (req.movie.id !== id) {
-      throw new UnauthorizedException();
-    }
-    return this.moviesService.findOne(id);
-  }
-
-  @Get('movies')
+  @Get()
   async getAllMovies(
     @Paginate() query: PaginateQuery,
   ): Promise<Paginated<Movie>> {
-    return await this.moviesService.getAllMovies(query);
+    return await this.movieService.getAllMovies(query);
   }
 
-  @Post('movies')
-  @UseInterceptors(HalInterceptor)
-  create(@Body() movie: any) {
-    return this.moviesService.create(movie);
+  @Get(':id')
+  @UseInterceptors(HalInterceptor) // Applying the HAL interceptor to the controller
+  async getMovieById(@Param('id') id: string): Promise<Movie> {
+    return await this.movieService.getMovieById(id);
   }
 
-  @Delete('movies/:id')
-  remove(@Param('id') id: string, @Req() req: any) {
-    if (req.movie.id !== id) {
-      throw new UnauthorizedException();
-    }
-    return this.moviesService.delete(id);
+  @Post()
+  @UseInterceptors(HalInterceptor) // Applying the HAL interceptor to the controller
+  async createMovie(@Body() createMovieDto: CreateMovieDto): Promise<Movie> {
+    return await this.movieService.createMovie(createMovieDto);
+  }
+
+  @Put(':id')
+  @UseInterceptors(HalInterceptor) // Applying the HAL interceptor to the controller
+  async updateMovie(
+    @Param('id') id: string,
+    @Body() updateMovieDto: UpdateMovieDto,
+  ): Promise<Movie> {
+    return await this.movieService.updateMovie(id, updateMovieDto);
+  }
+
+  @Delete(':id')
+  async deleteMovie(@Param('id') id: string): Promise<void> {
+    return await this.movieService.deleteMovie(id);
   }
 }

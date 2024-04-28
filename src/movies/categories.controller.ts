@@ -1,20 +1,20 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
+  NotFoundException,
+  Param,
   Post,
   Put,
-  Delete,
-  Param,
-  Body,
-  NotFoundException,
   UseInterceptors,
 } from '@nestjs/common';
-import { CategoryService } from './category.service';
-import { Category } from './entities/category.entity';
-import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
-import { Movie } from './entities/movie.entity';
 import { Paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
-import { HalCategoryInterceptor } from './hal.category.interceptor';
+import { CategoryService } from './categories.service';
+import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
+import { Category } from './entities/category.entity';
+import { Movie } from './entities/movie.entity';
+import { HalCategoryInterceptor } from './interceptors/hal.category.interceptor';
 
 @Controller('categories')
 export class CategoryController {
@@ -29,7 +29,7 @@ export class CategoryController {
 
   @Get(':id')
   @UseInterceptors(HalCategoryInterceptor)
-  async getCategoryById(@Param('id') id: number): Promise<Category> {
+  async getCategoryById(@Param('id') id: string): Promise<Category> {
     const category = await this.categoryService.getCategoryById(id);
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} not found`);
@@ -48,7 +48,7 @@ export class CategoryController {
   @Put(':id')
   @UseInterceptors(HalCategoryInterceptor)
   async updateCategory(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
     return await this.categoryService.updateCategory(id, updateCategoryDto);
@@ -56,12 +56,15 @@ export class CategoryController {
 
   @Delete(':id')
   @UseInterceptors(HalCategoryInterceptor)
-  async deleteCategory(@Param('id') id: number): Promise<void> {
+  async deleteCategory(@Param('id') id: string): Promise<void> {
     await this.categoryService.deleteCategory(id);
   }
 
   @Get(':id/movies')
-  async getMoviesByCategory(@Param('id') id: number): Promise<Movie[]> {
-    return await this.categoryService.getMoviesByCategory(id);
+  async getMoviesByCategory(
+    @Param('id') id: string,
+    @Paginate() query: PaginateQuery,
+  ): Promise<Paginated<Movie>> {
+    return await this.categoryService.getMoviesByCategory(id, query);
   }
 }
