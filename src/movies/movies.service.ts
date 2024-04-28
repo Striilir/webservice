@@ -4,15 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { Movie } from './entities/movie.entity';
-import { Query } from 'express-serve-static-core';
-import {
-  paginate,
-  Pagination,
-  IPaginationOptions,
-} from 'nestjs-typeorm-paginate';
+import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 
 @Injectable()
 export class MoviesService {
@@ -60,21 +55,12 @@ export class MoviesService {
     return movie;
   }
 
-  async findAll(query: Query): Promise<Movie[]> {
-    const search = query.search
-      ? [
-          {
-            name: ILike(`%${query.search}%`),
-          },
-          {
-            description: ILike(`%${query.search}%`),
-          },
-        ]
-      : {};
-    const movies = await this.moviesRepository.find({
-      where: search,
+  async getAllMovies(query: PaginateQuery): Promise<Paginated<Movie>> {
+    return await paginate(query, this.moviesRepository, {
+      sortableColumns: ['id'],
+      relations: ['categories'],
+      defaultLimit: 5,
     });
-    return movies;
   }
 
   async create(movie: Movie): Promise<Movie> {
@@ -95,12 +81,5 @@ export class MoviesService {
       throw new NotFoundException('Movie not found');
     }
     await this.moviesRepository.delete(id);
-  }
-
-  async paginate(options: IPaginationOptions): Promise<Pagination<Movie>> {
-    const queryBuilder = this.moviesRepository.createQueryBuilder('c');
-    queryBuilder.orderBy('c.name', 'DESC');
-
-    return paginate<Movie>(queryBuilder, options);
   }
 }

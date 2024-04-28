@@ -2,6 +2,7 @@ export class MovieOutputDto {
   id: string;
   name: string;
   description: string;
-  date: Date;
+  date: string;
   note: string;
+  categoriesID: number;
 }

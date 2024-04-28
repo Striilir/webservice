@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
+import { Category } from './category.entity';
 
 @Entity()
 export class Movie {
@@ -16,4 +23,8 @@ export class Movie {
 
   @Column({ type: 'int' })
   note: number;
+
+  @ManyToMany(() => Category)
+  @JoinTable()
+  categories: Category[];
 }

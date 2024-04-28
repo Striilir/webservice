@@ -1,4 +1,11 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsArray,
+  IsOptional,
+} from 'class-validator';
 
 export class UpdateMovieDto {
   @IsString()
@@ -13,4 +20,8 @@ export class UpdateMovieDto {
   @IsNumber()
   @IsNotEmpty()
   note?: number | undefined;
+  @IsArray()
+  @IsNumber({}, { each: true })
+  @IsOptional()
+  categoryIds: number[]; // New field to add category IDs
 }
